@@ -67,10 +67,10 @@ response = client.elements.geometry.post(bboxes=[8.625,49.3711,8.7334,49.4397],
 					 time="2020-01-01",
 					 filter="landuse=farmland and type:way",
 					 properties="tags")
-response_gdf = response.as_geodataframe()
+response_gdf = response.as_dataframe()
 ```
 
-Responses from the data extraction endpoint can be converted to a `geopandas.GeoDataFrame`  using the `OhsomeResponse.as_geodataframe()` method, since the data contains geometries.
+Responses from the data extraction endpoint can be converted to a `geopandas.GeoDataFrame`  using the `OhsomeResponse.as_dataframe()` method, since the data contains geometries.
 
 ### Query Parameters
 
