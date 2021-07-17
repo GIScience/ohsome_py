@@ -6,7 +6,12 @@ import urllib
 
 import requests
 from ohsome import OhsomeException, OhsomeResponse
-from ohsome.constants import DEFAULT_LOG_DIR, DEFAULT_LOG, OHSOME_BASE_API_URL
+from ohsome.constants import (
+    DEFAULT_LOG_DIR,
+    DEFAULT_LOG,
+    OHSOME_BASE_API_URL,
+    OHSOME_VERSION,
+)
 from ohsome.helper import (
     extract_error_message_from_invalid_json,
     format_boundary,
@@ -19,7 +24,12 @@ from requests.packages.urllib3.util.retry import Retry
 
 class _OhsomeBaseClient:
     def __init__(
-        self, base_api_url=None, log=DEFAULT_LOG, log_dir=DEFAULT_LOG_DIR, cache=None
+        self,
+        base_api_url=None,
+        log=DEFAULT_LOG,
+        log_dir=DEFAULT_LOG_DIR,
+        cache=None,
+        user_agent=None,
     ):
         """
         Initialize _OhsomeInfoClient object
@@ -38,6 +48,10 @@ class _OhsomeBaseClient:
         else:
             self._base_api_url = OHSOME_BASE_API_URL
         self._cache = cache or []
+        if user_agent is not None:
+            self.user_agent = user_agent
+        else:
+            self.user_agent = "ohsome-py/{0}".format(OHSOME_VERSION)
         self.__session = None
 
     def _session(self):
@@ -56,6 +70,7 @@ class _OhsomeBaseClient:
             self.__session = requests.Session()
             self.__session.mount("https://", adapter)
             self.__session.mount("http://", adapter)
+            self.__session.headers["user-agent"] = self.user_agent
         return self.__session
 
     def __repr__(self):
@@ -66,7 +81,12 @@ class _OhsomeInfoClient(_OhsomeBaseClient):
     """Client for metadata of ohsome API"""
 
     def __init__(
-        self, base_api_url=None, log=DEFAULT_LOG, log_dir=DEFAULT_LOG_DIR, cache=None
+        self,
+        base_api_url=None,
+        log=DEFAULT_LOG,
+        log_dir=DEFAULT_LOG_DIR,
+        cache=None,
+        user_agent=None,
     ):
         """
         Initialize _OhsomeInfoClient object
@@ -75,7 +95,9 @@ class _OhsomeInfoClient(_OhsomeBaseClient):
         :param log_dir: Directory for log files, default: ./ohsome_log
         :param cache: Cache for endpoint components
         """
-        super(_OhsomeInfoClient, self).__init__(base_api_url, log, log_dir, cache)
+        super(_OhsomeInfoClient, self).__init__(
+            base_api_url, log, log_dir, cache, user_agent
+        )
         self._parameters = None
         self._metadata = None
         self._url = None
@@ -154,7 +176,12 @@ class _OhsomePostClient(_OhsomeBaseClient):
     """Client for sending requests to ohsome API"""
 
     def __init__(
-        self, base_api_url=None, log=DEFAULT_LOG, log_dir=DEFAULT_LOG_DIR, cache=None
+        self,
+        base_api_url=None,
+        log=DEFAULT_LOG,
+        log_dir=DEFAULT_LOG_DIR,
+        cache=None,
+        user_agent=None,
     ):
         """
         Initialize _OhsomePostClient object
@@ -163,7 +190,9 @@ class _OhsomePostClient(_OhsomeBaseClient):
         :param log_dir: Directory for log files, default: ./ohsome_log
         :param cache: Cache for endpoint components
         """
-        super(_OhsomePostClient, self).__init__(base_api_url, log, log_dir, cache)
+        super(_OhsomePostClient, self).__init__(
+            base_api_url, log, log_dir, cache, user_agent
+        )
         self._parameters = None
         self._metadata = None
         self._url = None
